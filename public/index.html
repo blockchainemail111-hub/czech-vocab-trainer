@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Česky — тренажер чеських слів</title>
+<style>
+:root{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#172033;background:#f5f7fb}
+*{box-sizing:border-box}body{margin:0;min-height:100vh}.wrap{max-width:1050px;margin:0 auto;padding:24px 16px 50px}
+header{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:20px}.brand{font-size:28px;font-weight:850}.sub{color:#687386;font-size:14px;margin-top:4px}.score{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.pill{padding:8px 12px;border-radius:999px;background:#eef2ff;color:#3949ab;font-size:13px;font-weight:750}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:24px;box-shadow:0 12px 35px rgba(20,30,50,.07);padding:24px}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}.toolbar select,.toolbar button{padding:10px 12px;border-radius:11px;border:1px solid #dfe4ec;background:#fff;font-weight:650;color:#303949}.toolbar button{cursor:pointer}.toolbar button:hover{background:#f7f8fb}
+.top{display:flex;justify-content:space-between;gap:12px;align-items:center}.stats{color:#6b7280;font-size:14px}.word{font-size:clamp(44px,10vw,82px);font-weight:850;text-align:center;margin:42px 0 18px;letter-spacing:-1px}.hint{text-align:center;color:#8a93a3;min-height:22px;margin-bottom:15px}
+.input-row{display:flex;gap:10px;align-items:center}.input-wrap{position:relative;flex:1}.input-wrap input{width:100%;font-size:22px;padding:17px 48px 17px 18px;border:2px solid #dbe1ea;border-radius:15px;outline:none;transition:.15s}.input-wrap input:focus{border-color:#6475ff;box-shadow:0 0 0 4px #e9edff}.speak{position:absolute;right:9px;top:50%;transform:translateY(-50%);border:0;background:#eef1f6;border-radius:10px;width:36px;height:36px;cursor:pointer;font-size:17px}.buttons{display:flex;gap:10px;margin-top:12px}.btn{border:0;border-radius:14px;padding:14px 18px;font-size:16px;font-weight:750;cursor:pointer}.primary{background:#3347d8;color:#fff;flex:1}.secondary{background:#eef1f6;color:#253044}.btn:disabled{opacity:.5;cursor:not-allowed}
+.keyboard{font-size:12px;color:#8a93a3;text-align:center;margin-top:9px}.result{margin-top:16px;padding:15px;border-radius:14px;display:none}.correct{background:#ecfdf3;color:#067647}.wrong{background:#fff4ed;color:#b54708}.answer{font-weight:800}.progress{height:8px;background:#e9edf3;border-radius:99px;overflow:hidden;margin-top:16px}.bar{height:100%;width:0;background:#5367ed;transition:.2s}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}.stat{background:#f7f8fb;border-radius:14px;padding:13px}.stat b{display:block;font-size:20px}.stat span{color:#737d8e;font-size:12px}
+.section{margin-top:22px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.section h2{font-size:18px;margin:0}.table{width:100%;border-collapse:collapse;font-size:14px;margin-top:10px;background:#fff}.table th,.table td{text-align:left;padding:10px 8px;border-bottom:1px solid #edf0f4}.table th{color:#6b7280}.muted{color:#8a93a3}footer{margin-top:18px;color:#8a93a3;font-size:12px;text-align:center}.hidden{display:none!important}
+@media(max-width:700px){.card{padding:17px}.input-row{display:block}.speak{right:8px}.buttons{flex-direction:column}.stats-grid{grid-template-columns:repeat(2,1fr)}.score{display:none}.word{margin:32px 0 18px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div><div class="brand">🇨🇿 Česky</div><div class="sub">Тренажер чеських слів із твоїх записів</div></div>
+  <div class="score"><span class="pill" id="score">0 / 0</span><span class="pill" id="streak">Серія: 0</span></div>
+</header>
+
+<div class="card">
+  <div class="toolbar">
+    <select id="category" aria-label="Категорія"><option value="all">Усі слова</option><option value="weather">Погода</option><option value="personal">Особисті дані</option><option value="questions">Основні питання</option></select>
+    <select id="mode" aria-label="Режим"><option value="review">Повторення</option><option value="all">Усі слова по черзі</option><option value="weak">Слова, які забуваю</option><option value="random">Випадковий порядок</option></select>
+    <button id="reset">Скинути прогрес</button>
+  </div>
+  <div class="top"><span class="pill" id="catLabel">Усі слова</span><span class="stats" id="counter">1 / 29</span></div>
+  <div class="word" id="word">déšť</div>
+  <div class="hint">Напиши переклад українською або російською</div>
+  <div class="input-row">
+    <div class="input-wrap"><input id="answer" autocomplete="off" autofocus placeholder="Твій переклад…" /><button class="speak" id="speakInput" title="Прослухати слово">🔊</button></div>
+  </div>
+  <div class="buttons"><button class="btn primary" id="check">Перевірити</button><button class="btn secondary" id="show">Показати відповідь</button><button class="btn secondary" id="next" disabled>Наступне →</button></div>
+  <div class="keyboard">Enter: перевірити → Enter ще раз: наступне слово</div>
+  <div class="result" id="result"></div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div class="stats-grid">
+    <div class="stat"><b id="todayCorrect">0</b><span>правильних сьогодні</span></div>
+    <div class="stat"><b id="accuracy">0%</b><span>точність</span></div>
+    <div class="stat"><b id="dueCount">0</b><span>до повторення</span></div>
+    <div class="stat"><b id="learnedCount">0</b><span>вивчено</span></div>
+  </div>
+</div>
+
+<div class="section"><div class="section-head"><h2>Слова</h2><span class="muted">Натисни 🔊, щоб почути чеську вимову</span></div>
+<table class="table"><thead><tr><th>Чеською</th><th>Українською</th><th>Російською</th></tr></thead><tbody id="wordList"></tbody></table></div>
+<footer>Прогрес і розклад повторення зберігаються у твоєму браузері. Нічого не надсилається на сервер.</footer>
+</div>
+<script>
+const WORDS = [
+{c:'déšť',u:['дощ'],r:['дождь'],cat:'weather'},
+{c:'prší',u:['йде дощ','іде дощ'],r:['идёт дождь','идет дождь'],cat:'weather'},
+{c:'vítr',u:['вітер'],r:['ветер'],cat:'weather'},
+{c:'sníh',u:['сніг'],r:['снег'],cat:'weather'},
+{c:'nebe',u:['небо'],r:['небо'],cat:'weather'},
+{c:'slunce',u:['сонце'],r:['солнце'],cat:'weather'},
+{c:'srážky',u:['опади'],r:['осадки'],cat:'weather'},
+{c:'počasí',u:['погода'],r:['погода'],cat:'weather'},
+{c:'podnebí',u:['клімат'],r:['климат'],cat:'weather'},
+{c:'jméno',u:['імʼя','імя'],r:['имя'],cat:'personal'},
+{c:'příjmení',u:['прізвище'],r:['фамилия'],cat:'personal'},
+{c:'adresa',u:['адреса'],r:['адрес'],cat:'personal'},
+{c:'číslo',u:['число','номер'],r:['число','номер'],cat:'personal'},
+{c:'telefonní číslo',u:['номер телефону','телефонний номер'],r:['номер телефона','телефонный номер'],cat:'personal'},
+{c:'narozeniny',u:['день народження'],r:['день рождения'],cat:'personal'},
+{c:'ženatý',u:['одружений'],r:['женатий','женат'],cat:'personal'},
+{c:'vdaná',u:['заміжня'],r:['замужем','замужняя'],cat:'personal'},
+{c:'email',u:['пошта','електронна пошта','імейл'],r:['почта','электронная почта','имейл'],cat:'personal'},
+{c:'co',u:['що'],r:['что'],cat:'questions'},
+{c:'kdo',u:['хто'],r:['кто'],cat:'questions'},
+{c:'kde',u:['де'],r:['где'],cat:'questions'},
+{c:'kam',u:['куди'],r:['куда'],cat:'questions'},
+{c:'odkud',u:['звідки'],r:['откуда'],cat:'questions'},
+{c:'jak',u:['як'],r:['как'],cat:'questions'},
+{c:'proč',u:['чому'],r:['почему'],cat:'questions'},
+{c:'kdy',u:['коли'],r:['когда'],cat:'questions'},
+{c:'jaký',u:['який'],r:['какий'],cat:'questions'},
+{c:'který',u:['котрий','який'],r:['который','какой'],cat:'questions'}
+];
+const catNames={all:'Усі слова',weather:'Погода',personal:'Особисті дані',questions:'Основні питання'};
+const $=id=>document.getElementById(id);
+const today=()=>new Date().toISOString().slice(0,10);
+let state=JSON.parse(localStorage.getItem('cz-vocab-state-v2')||'null') || {correct:0,attempts:0,streak:0,today:today(),todayCorrect:0,cards:{}};
+if(state.today!==today()){state.today=today();state.todayCorrect=0;state.streak=0;save();}
+let deck=[],current=0,answered=false;
+function save(){localStorage.setItem('cz-vocab-state-v2',JSON.stringify(state));updateStats()}
+function norm(s){return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ё/g,'е').replace(/ʼ|’|`/g,"'").replace(/[.,!?]/g,'').replace(/\s+/g,' ').trim()}
+function accepted(w){return [...w.u,...w.r].map(norm)}
+function card(c){return state.cards[c]||(state.cards[c]={level:0,due:0,seen:0,correct:0,wrong:0})}
+function isDue(w){return !card(w.c).due || card(w.c).due<=Date.now()}
+function buildDeck(){
+ const cat=$('category').value,mode=$('mode').value; let a=WORDS.filter(w=>cat==='all'||w.cat===cat);
+ if(mode==='review') { const due=a.filter(isDue); a=due.length?due:a.slice().sort((x,y)=>card(x.c).due-card(y.c).due).slice(0,Math.min(8,a.length)); }
+ if(mode==='weak') a=a.filter(w=>card(w.c).wrong>card(w.c).correct || card(w.c).level<2);
+ if(mode==='random') a.sort(()=>Math.random()-.5);
+ if(mode==='all') a=a.slice();
+ deck=a;current=0;render();updateStats();
+}
+function render(){
+ if(!deck.length){$('word').textContent='Усе готово!';$('counter').textContent='0 / 0';$('answer').disabled=true;$('check').disabled=true;$('show').disabled=true;$('next').disabled=true;return}
+ const w=deck[current%deck.length];$('word').textContent=w.c;$('catLabel').textContent=catNames[w.cat];$('counter').textContent=(current+1)+' / '+deck.length;$('answer').value='';$('answer').disabled=false;$('check').disabled=false;$('show').disabled=false;$('next').disabled=true;$('result').style.display='none';answered=false;$('bar').style.width=(current/deck.length*100)+'%';$('answer').focus();speak(w.c);
+}
+function updateStats(){
+ const acc=state.attempts?Math.round(state.correct/state.attempts*100):0; const due=WORDS.filter(isDue).length; const learned=WORDS.filter(w=>card(w.c).level>=3).length;
+ $('score').textContent=`${state.correct} / ${state.attempts}`;$('streak').textContent=`Серія: ${state.streak}`;$('todayCorrect').textContent=state.todayCorrect;$('accuracy').textContent=acc+'%';$('dueCount').textContent=due;$('learnedCount').textContent=learned;
+}
+function showResult(ok,text){const r=$('result');r.className='result '+(ok?'correct':'wrong');r.innerHTML=text;r.style.display='block'}
+function schedule(w,ok){const c=card(w.c);c.seen++;if(ok){c.correct++;c.level=Math.min(5,c.level+1);c.wrong=Math.max(0,c.wrong-1)}else{c.wrong++;c.level=Math.max(0,c.level-1)}const days=[0,0,1,3,7,21][c.level];c.due=Date.now()+days*86400000}
+function check(){if(!deck.length)return;if(answered){next();return}const w=deck[current%deck.length],val=norm($('answer').value);if(!val)return;const ok=accepted(w).includes(val);state.attempts++;if(ok){state.correct++;state.todayCorrect++;state.streak++;schedule(w,true);showResult(true,'✓ Правильно!') }else{state.streak=0;schedule(w,false);showResult(false,`✗ Не зовсім. Правильна відповідь: <span class="answer">${w.u[0]}</span> <span class="muted">(${w.r[0]})</span>`)}answered=true;$('next').disabled=false;save();speak(w.c)}
+function reveal(){if(!deck.length||answered)return;const w=deck[current%deck.length];state.attempts++;state.streak=0;schedule(w,false);showResult(false,`Відповідь: <span class="answer">${w.u[0]}</span> <span class="muted">(${w.r[0]})</span>`);answered=true;$('next').disabled=false;save()}
+function next(){current++;if(current>=deck.length){buildDeck();return}render()}
+function speak(text){if('speechSynthesis' in window){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='cs-CZ';u.rate=.82;speechSynthesis.speak(u)}}
+$('check').onclick=check;$('show').onclick=reveal;$('next').onclick=next;$('speakInput').onclick=()=>deck.length&&speak(deck[current%deck.length].c);$('category').onchange=buildDeck;$('mode').onchange=buildDeck;
+$('answer').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();check()}});
+$('reset').onclick=()=>{if(confirm('Скинути весь прогрес і розклад повторення?')){state={correct:0,attempts:0,streak:0,today:today(),todayCorrect:0,cards:{}};save();buildDeck()}};
+$('wordList').innerHTML=WORDS.map(w=>`<tr><td><b>${w.c}</b></td><td>${w.u.join(', ')}</td><td>${w.r.join(', ')}</td></tr>`).join('');
+updateStats();buildDeck();
+</script>
+</body></html>
