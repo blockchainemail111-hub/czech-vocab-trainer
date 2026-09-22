@@ -1,0 +1,9 @@
+{
+  "name": "czech-vocab-trainer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Czech vocabulary trainer based on handwritten notes",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "dependencies": { "express": "^4.21.2" }
+}
